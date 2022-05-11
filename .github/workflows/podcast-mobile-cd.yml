@@ -92,18 +92,18 @@ jobs:
 
       - name: Install MAUI Workloads
         run: |
-          dotnet workload install maui --ignore-failed-sources
+          dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
       # BUILD
       - name: Restore dependencies
         shell: pwsh
         run: |
-          & .\dotnet restore ${{ env.CSPROJ_PATH }}
+          dotnet restore ${{ env.CSPROJ_PATH }}
 
       - name: Build MAUI Android
         shell: pwsh
         run: |
-          & .\dotnet build ${{ env.CSPROJ_PATH }} -c Release -f net6.0-android --no-restore /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{ env.KEYSTORE_PATH }} /p:AndroidSigningStorePass=${{ secrets.ANDROID_SIGNING_STORE_PASS }} /p:AndroidSigningKeyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }} /p:AndroidSigningKeyPass=${{ secrets.ANDROID_SIGNING_KEY_PASS }}
+          dotnet build ${{ env.CSPROJ_PATH }} -c Release -f net6.0-android --no-restore /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{ env.KEYSTORE_PATH }} /p:AndroidSigningStorePass=${{ secrets.ANDROID_SIGNING_STORE_PASS }} /p:AndroidSigningKeyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }} /p:AndroidSigningKeyPass=${{ secrets.ANDROID_SIGNING_KEY_PASS }}
 
       #TODO Build IOS AND MacOS      
       #POST-BUILD
