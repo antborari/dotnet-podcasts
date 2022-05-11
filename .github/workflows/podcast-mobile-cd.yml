@@ -81,6 +81,7 @@ jobs:
       - name: Install MAUI Workloads
         run: |
           dotnet workload install ios --ignore-failed-sources
+          dotnet workload install maccatalyst --ignore-failed-sources
           dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
       # BUILD
@@ -88,8 +89,10 @@ jobs:
         run: dotnet restore ${{ env.CSPROJ_PATH }}
 
       - name: Build MAUI IOS
-        shell: pwsh
         run: dotnet publish ${{ env.CSPROJ_PATH }} -c Release -f net6.0-ios --no-restore
+
+      - name: Build MAUI MacCatalyst
+        run: dotnet build src/MauiBeach/MauiBeach.csproj -c Release -f net6.0-maccatalyst --no-restore
 
       #TODO Build IOS AND MacOS      
       #POST-BUILD
@@ -100,16 +103,6 @@ jobs:
            mkdir ${{ env.ARTIFACTS_PATH }}
 
       #TODO add filter and only upload signed artifacts      
-      - name: Copy APKs
-        shell: pwsh 
-        run: |
-           Get-Childitem –Path ${{ github.workspace }} -Include *.apk -File -Recurse | Copy-Item -Destination ${{ env.ARTIFACTS_PATH }}
-
-      - name: Copy AABs
-        shell: pwsh
-        run: |
-           Get-Childitem –Path ${{ github.workspace }} -Include *.aab -File -Recurse | Copy-Item -Destination ${{ env.ARTIFACTS_PATH }}
-
       - name: Publish build artifacts
         uses: actions/upload-artifact@v2
         with:     
