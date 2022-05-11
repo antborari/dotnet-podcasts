@@ -80,18 +80,16 @@ jobs:
 
       - name: Install MAUI Workloads
         run: |
+          dotnet workload install ios --ignore-failed-sources
           dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
       # BUILD
       - name: Restore dependencies
-        shell: pwsh
-        run: |
-          dotnet restore ${{ env.CSPROJ_PATH }}
+        run: dotnet restore ${{ env.CSPROJ_PATH }}
 
       - name: Build MAUI IOS
         shell: pwsh
-        run: |
-          dotnet publish ${{ env.CSPROJ_PATH }} -c Release -f net6.0-ios --no-restore
+        run: dotnet publish ${{ env.CSPROJ_PATH }} -c Release -f net6.0-ios --no-restore
 
       #TODO Build IOS AND MacOS      
       #POST-BUILD
