@@ -18,62 +18,56 @@ env:
   ARTIFACTS_PATH: artifacts # RELATIVE TO github.workspace
 
 jobs:
-  windows-build-windows:
-    runs-on: windows-latest
+  # windows-build-windows:
+  #   runs-on: windows-latest
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Decrypt keystore
-        shell: pwsh
-        run: |
-          cd ${{ github.workspace }}
-          gpg --quiet --batch --yes --decrypt --passphrase=${{ secrets.ANDROID_KEYSTORE_GPG_PASSWORD }} --output ${{ env.KEYSTORE_PATH }} ${{ env.ENCRYPTED_KEYSTORE_PATH }}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Install .NET 6
+  #       shell: pwsh
+  #       run: |
+  #         $ProgressPreference = 'SilentlyContinue'
+  #         Invoke-WebRequest https://dot.net/v1/dotnet-install.ps1 -OutFile dotnet-install.ps1
+  #         .\dotnet-install.ps1 -Channel 6.0.3xx -Quality daily -InstallDir .
 
-      - name: Install .NET 6
-        shell: pwsh
-        run: |
-          $ProgressPreference = 'SilentlyContinue'
-          Invoke-WebRequest https://dot.net/v1/dotnet-install.ps1 -OutFile dotnet-install.ps1
-          .\dotnet-install.ps1 -Channel 6.0.3xx -Quality daily -InstallDir .
+  #     - name: Install MAUI workload
+  #       shell: pwsh
+  #       run: |
+  #         $ProgressPreference = 'SilentlyContinue'
+  #         Invoke-WebRequest https://raw.githubusercontent.com/dotnet/maui/main/NuGet.config -OutFile maui-main-NuGet.config
+  #         & .\dotnet workload install maui --from-rollback-file https://aka.ms/dotnet/maui/main.json --configfile maui-main-NuGet.config
 
-      - name: Install MAUI workload
-        shell: pwsh
-        run: |
-          $ProgressPreference = 'SilentlyContinue'
-          Invoke-WebRequest https://raw.githubusercontent.com/dotnet/maui/main/NuGet.config -OutFile maui-main-NuGet.config
-          & .\dotnet workload install maui --from-rollback-file https://aka.ms/dotnet/maui/main.json --configfile maui-main-NuGet.config
+  #     # BUILD
+  #     - name: Restore dependencies
+  #       shell: pwsh
+  #       run: |
+  #         & .\dotnet restore ${{ env.CSPROJ_PATH }}
 
-      # BUILD
-      - name: Restore dependencies
-        shell: pwsh
-        run: |
-          & .\dotnet restore ${{ env.CSPROJ_PATH }}
+  #     #You need your csrpoj.targetframeworks net6.0-windows10.0.19041 without Condition="$([MSBuild]::IsOSPlatform......
+  #     - name: Build Maui WinUI project
+  #       shell: pwsh
+  #       run: |
+  #         & .\dotnet publish ${{ env.CSPROJ_PATH }} -c Release -f net6.0-windows10.0.19041
 
-      #You need your csrpoj.targetframeworks net6.0-windows10.0.19041 without Condition="$([MSBuild]::IsOSPlatform......
-      - name: Build Maui WinUI project
-        shell: pwsh
-        run: |
-          & .\dotnet publish ${{ env.CSPROJ_PATH }} -c Release -f net6.0-windows10.0.19041
+  #     #POST-BUILD
+  #     - name: Create artifacts folder
+  #       shell: pwsh
+  #       run: |
+  #          cd ${{ github.workspace }}
+  #          mkdir ${{ env.ARTIFACTS_PATH }}
 
-      #POST-BUILD
-      - name: Create artifacts folder
-        shell: pwsh
-        run: |
-           cd ${{ github.workspace }}
-           mkdir ${{ env.ARTIFACTS_PATH }}
+  #     - name: Copy Windows bin
+  #       shell: pwsh 
+  #       run: |
+  #          Get-Childitem –Path ${{ github.workspace }} -Include *.msix -File -Recurse | Copy-Item -Destination ${{ env.ARTIFACTS_PATH }}
 
-      - name: Copy Windows bin
-        shell: pwsh 
-        run: |
-           Get-Childitem –Path ${{ github.workspace }} -Include *.msix -File -Recurse | Copy-Item -Destination ${{ env.ARTIFACTS_PATH }}
-
-      - name: Publish build artifacts
-        uses: actions/upload-artifact@v2
-        with:     
-          name: "Podcast Mobile artifacts" 
-          path: "${{ env.ARTIFACTS_PATH }}/*"
-          if-no-files-found: error
-          retention-days: 90
+  #     - name: Publish build artifacts
+  #       uses: actions/upload-artifact@v2
+  #       with:     
+  #         name: "WinUI .NET MAUI artifacts" 
+  #         path: "${{ env.ARTIFACTS_PATH }}/*"
+  #         if-no-files-found: error
+  #         retention-days: 90
 
   macos-build-android-macos-ios:
     runs-on: macos-12
@@ -85,19 +79,20 @@ jobs:
           cd ${{ github.workspace }}
           gpg --quiet --batch --yes --decrypt --passphrase=${{ secrets.ANDROID_KEYSTORE_GPG_PASSWORD }} --output ${{ env.KEYSTORE_PATH }} ${{ env.ENCRYPTED_KEYSTORE_PATH }}
 
-      - name: Install .NET 6
-        shell: pwsh
-        run: |
-          $ProgressPreference = 'SilentlyContinue'
-          Invoke-WebRequest https://dot.net/v1/dotnet-install.ps1 -OutFile dotnet-install.ps1
-          .\dotnet-install.ps1 -Channel 6.0.3xx -Quality daily -InstallDir .
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+          include-prerelease: true
 
-      - name: Install MAUI workload
-        shell: pwsh
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'microsoft'
+          java-version: '11'     
+
+      - name: Install MAUI Workloads
         run: |
-          $ProgressPreference = 'SilentlyContinue'
-          Invoke-WebRequest https://raw.githubusercontent.com/dotnet/maui/main/NuGet.config -OutFile maui-main-NuGet.config
-          & .\dotnet workload install maui --from-rollback-file https://aka.ms/dotnet/maui/main.json --configfile maui-main-NuGet.config
+          dotnet workload install maui --ignore-failed-sources
 
       # BUILD
       - name: Restore dependencies
@@ -118,6 +113,7 @@ jobs:
            cd ${{ github.workspace }}
            mkdir ${{ env.ARTIFACTS_PATH }}
 
+      #TODO add filter and only upload signed artifacts      
       - name: Copy APKs
         shell: pwsh 
         run: |
