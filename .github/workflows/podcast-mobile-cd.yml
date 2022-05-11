@@ -38,9 +38,10 @@ jobs:
 
       # BUILD
       - name: Restore dependencies
-        run: |
-          dotnet restore ${{ env.CSPROJ_PATH }}
-          dotnet restore -r ios-arm64
+        run: dotnet restore ${{ env.CSPROJ_PATH }}
+
+      - name: Restore ios
+        run: dotnet restore -r ios-arm64
 
       - name: Build MAUI IOS
         run: dotnet publish ${{ env.CSPROJ_PATH }} -c Release -f net6.0-ios --no-restore
