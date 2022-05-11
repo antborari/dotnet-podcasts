@@ -8,7 +8,7 @@ on:
       - '**/*build.props'      
       - '.github/workflows/podcast-mobile.yml'
   pull_request:
-    branches: [ main, maui/perf ]
+    branches: [ main, maui/perf, release/next-steps ]
     paths:
       - 'src/Mobile/**'
       - '**/*build.props'      
