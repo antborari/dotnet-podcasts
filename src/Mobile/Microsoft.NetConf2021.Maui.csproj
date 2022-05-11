@@ -31,8 +31,12 @@
     <TargetPlatformMinVersion Condition="$(TargetFramework.Contains('-windows'))">10.0.17763.0</TargetPlatformMinVersion>
   </PropertyGroup>
 
-  <!-- Support for iOS ARM64 devices -->    
-  <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
+  <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
+    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+    <CodesignEntitlement>Entitlements.plist</CodesignEntitlement>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
     <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
     <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
   </PropertyGroup>
