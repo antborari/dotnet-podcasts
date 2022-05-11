@@ -76,7 +76,7 @@ jobs:
         shell: pwsh
         run: |
           cd ${{ github.workspace }}
-          gpg --quiet --batch --yes --decrypt --passphrase=${{ secrets.ANDROID_KEYSTORE_GPG_PASSWORD }} --output ${{ROOT_PATH}}${{ env.KEYSTORE_PATH }} ${{ env.ENCRYPTED_KEYSTORE_PATH }}
+          gpg --quiet --batch --yes --decrypt --passphrase=${{ secrets.ANDROID_KEYSTORE_GPG_PASSWORD }} --output ${{env.ROOT_PATH}}${{ env.KEYSTORE_PATH }} ${{ env.ENCRYPTED_KEYSTORE_PATH }}
 
       - name: Setup .NET 6
         uses: actions/setup-dotnet@v2
