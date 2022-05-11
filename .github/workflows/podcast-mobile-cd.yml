@@ -72,22 +72,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Decrypt keystore
-        shell: pwsh
-        run: |
-          cd ${{ github.workspace }}
-          gpg --quiet --batch --yes --decrypt --passphrase=${{ secrets.ANDROID_KEYSTORE_GPG_PASSWORD }} --output ${{env.ROOT_PATH}}${{ env.KEYSTORE_PATH }} ${{ env.ENCRYPTED_KEYSTORE_PATH }}
-
       - name: Setup .NET 6
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 6.0.x
           include-prerelease: true
-
-      - uses: actions/setup-java@v2
-        with:
-          distribution: 'microsoft'
-          java-version: '11'     
 
       - name: Install MAUI Workloads
         run: |
@@ -98,11 +87,6 @@ jobs:
         shell: pwsh
         run: |
           dotnet restore ${{ env.CSPROJ_PATH }}
-
-      - name: Build MAUI Android
-        shell: pwsh
-        run: |
-          dotnet publish ${{ env.CSPROJ_PATH }} -c Release -f net6.0-android --no-restore /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{ env.KEYSTORE_PATH }} /p:AndroidSigningStorePass=${{ secrets.ANDROID_SIGNING_STORE_PASS }} /p:AndroidSigningKeyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }} /p:AndroidSigningKeyPass=${{ secrets.ANDROID_SIGNING_KEY_PASS }}
 
       - name: Build MAUI IOS
         shell: pwsh
