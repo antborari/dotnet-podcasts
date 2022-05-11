@@ -19,54 +19,6 @@ env:
   ARTIFACTS_PATH: artifacts # RELATIVE TO github.workspace
 
 jobs:
-  windows-build-windows:
-    runs-on: windows-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup .NET 6
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: 6.0.x
-          include-prerelease: true
-
-      - name: Install MAUI Workloads
-        run: |
-          dotnet workload install maui --source https://api.nuget.org/v3/index.json
-
-      # BUILD
-      - name: Restore dependencies
-        shell: pwsh
-        run: |
-          dotnet restore ${{ env.CSPROJ_PATH }}
-
-
-      #You need your csrpoj.targetframeworks net6.0-windows10.0.19041 without Condition="$([MSBuild]::IsOSPlatform......
-      - name: Build Maui WinUI project
-        shell: pwsh
-        run: |
-          dotnet publish ${{ env.CSPROJ_PATH }} -c Release -f net6.0-windows10.0.19041
-
-      #POST-BUILD
-      - name: Create artifacts folder
-        shell: pwsh
-        run: |
-           cd ${{ github.workspace }}
-           mkdir ${{ env.ARTIFACTS_PATH }}
-
-      - name: Copy Windows bin
-        shell: pwsh 
-        run: |
-           Get-Childitem –Path ${{ github.workspace }} -Include *.msix -File -Recurse | Copy-Item -Destination ${{ env.ARTIFACTS_PATH }}
-
-      - name: Publish build artifacts
-        uses: actions/upload-artifact@v2
-        with:     
-          name: "WinUI .NET MAUI artifacts" 
-          path: "${{ env.ARTIFACTS_PATH }}/*"
-          if-no-files-found: error
-          retention-days: 90
-
   macos-build-android-macos-ios:
     runs-on: macos-12
     steps:
@@ -86,7 +38,7 @@ jobs:
 
       # BUILD
       - name: Restore dependencies
-        run:  |
+        run: |
           dotnet restore ${{ env.CSPROJ_PATH }}
           dotnet restore -r ios-arm64
 
