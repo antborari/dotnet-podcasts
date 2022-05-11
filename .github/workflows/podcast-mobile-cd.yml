@@ -103,7 +103,12 @@ jobs:
       - name: Build MAUI Android
         shell: pwsh
         run: |
-          dotnet build ${{ env.CSPROJ_PATH }} -c Release -f net6.0-android --no-restore /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{ env.KEYSTORE_PATH }} /p:AndroidSigningStorePass=${{ secrets.ANDROID_SIGNING_STORE_PASS }} /p:AndroidSigningKeyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }} /p:AndroidSigningKeyPass=${{ secrets.ANDROID_SIGNING_KEY_PASS }}
+          dotnet publish ${{ env.CSPROJ_PATH }} -c Release -f:net6.0-android --no-restore /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{ env.KEYSTORE_PATH }} /p:AndroidSigningStorePass=${{ secrets.ANDROID_SIGNING_STORE_PASS }} /p:AndroidSigningKeyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }} /p:AndroidSigningKeyPass=${{ secrets.ANDROID_SIGNING_KEY_PASS }}
+
+      - name: Build MAUI IOS
+        shell: pwsh
+        run: |
+          dotnet publish -c Release -f net6.0-ios --no-restore
 
       #TODO Build IOS AND MacOS      
       #POST-BUILD
