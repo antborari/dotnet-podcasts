@@ -42,6 +42,7 @@
   <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
     <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
     <CodesignEntitlement>Entitlements.plist</CodesignEntitlement>
+    <MtouchUseLlvm>False</MtouchUseLlvm>
   </PropertyGroup>
   
   <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
