@@ -44,7 +44,9 @@ jobs:
         run: dotnet build ${{ env.CSPROJ_PATH }} -c Release -f net6.0-maccatalyst --no-restore
 
       - name: Build MAUI IOS
-        run: dotnet build ${{ env.CSPROJ_PATH }} -c Release -f net6.0-ios --no-restore
+        shell: pwsh
+        run: |
+        dotnet publish ${{ env.CSPROJ_PATH }} -c Release -f net6.0-ios --no-restore -p:ArchiveOnBuild=true
 
       #TODO Build IOS AND MacOS      
       #POST-BUILD
